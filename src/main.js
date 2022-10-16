@@ -29,7 +29,7 @@ import { SnackbarService, Vue3Snackbar } from "vue3-snackbar";
 import "vue3-snackbar/dist/style.css";
 
 
-//гераксил
+//СОНИК
 
 router.beforeEach(async (to, from, next) => {
   try{
