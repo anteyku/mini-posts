@@ -9,14 +9,15 @@
           <div class="cab__left__avatar">
             <img v-lazy="{src: `anime-girl-sunset-glow-loneliness-3c-3840x2160.jpg`}" alt="avatar">
           </div>
-          <div class="cab__left__btn-edit">
+          <input @change="changeAvata" style="display: none" type="file" id="avatar">
+          <label for="avatar" class="cab__left__btn-edit">
             СМЕНИТЬ АВАТАРКУ
-          </div>
+          </label>
           <div class="cab__left__name">
             {{ $store.state.user.login }}
           </div>
           <div class="cab__left__age">
-          Возраст - {{ $store.state.user.age }}
+          Возраст - {{ textarea.age.descText }}
           </div>
         </div>
       </b-col>
@@ -54,17 +55,21 @@
 
           <div class="cab__right__info">
             <div class="cab__right__label">E-mail</div>
-            <div class="cab__right__value">
-              {{ $store.state.user.email }}
-            <i class="material-icons">edit</i>
+            <div v-if="!textarea.email.editToggle" class="cab__right__description">
+              {{ textarea.email.descText }}
             </div>
           </div>
 
           <div class="cab__right__info">
             <div class="cab__right__label">Пароль</div>
-            <div class="cab__right__value">
+            <div class="cab__right__description">
               ***************
-              <i class="material-icons">edit</i>
+            </div>
+            <textarea v-if="textarea.password.editToggle" v-model="textarea.password.editText" class="cab__right__description" id="" cols="30" rows="10"></textarea>
+            <div class="cab__right__value">
+              <i v-if="!textarea.password.editToggle" @click="textarea.password.editToggle = !textarea.password.editToggle" class="material-icons">edit</i>
+              <button v-if="textarea.password.editToggle" @click="textarea.password.editToggle = !textarea.password.editToggle" id="cancel">Отмена</button>
+              <button v-if="textarea.password.editToggle" @click="saveEdit(`password`)" id="save">Сохранить</button>
             </div>
           </div>
 
@@ -139,12 +144,14 @@ export default {
         email:
         {
           editToggle: false,
-          descText: ``
+          descText:this.$store.state.user.email,
+          editText: this.$store.state.user.email,
         },
         password:
         {
           editToggle: false,
-          descText: ``
+          descText:this.$store.state.user.password,
+          editText: ``
         }
       }
     }
@@ -155,6 +162,11 @@ export default {
       await this.axios.post(`http://localhost:3001/edit/${input}`, {[input]:this.textarea[input].editText}).then((response) => {
                   if(response.data.succes == false){
                     console.log(`Чтото пошло не так`);
+                    this.$snackbar.add({
+                        type: 'error',
+                        title: "Ошибка",
+                        text: response.data.text
+                    })
                   } else if(response.data.succes == true){
                     this.textarea[input].editToggle = false;
                     this.textarea[input].descText = this.textarea[input].editText;
@@ -168,6 +180,9 @@ export default {
 
                   }        
       })      
+    },
+    async changeAvata(){
+      console.log(`ЗАПРОС НА СМЕНУ АВАТАРКИ`)
     }
   }
 }
@@ -369,6 +384,7 @@ export default {
         margin-top: 23px;
         cursor: pointer;
         font-weight: 400px;
+        display: block;
 
         &:hover{
           background-color: white;
@@ -394,6 +410,7 @@ export default {
       margin-top: 87px;
       box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
       padding: 27px;
+      padding-bottom: 32px;
       font-family: @roboto;
       .cab__right__info{
         .cab__right__title{
