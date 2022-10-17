@@ -29,7 +29,7 @@ import { SnackbarService, Vue3Snackbar } from "vue3-snackbar";
 import "vue3-snackbar/dist/style.css";
 
 
-// СДЕЛАЛ КОМИТ КОМАНДОЙ
+// СДЕЛАЛ КОМИТ КОМАНДОЙ 2
 
 router.beforeEach(async (to, from, next) => {
   try{
