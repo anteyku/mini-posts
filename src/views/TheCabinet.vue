@@ -9,7 +9,7 @@
           <div class="cab__left__avatar">
             <img v-lazy="{src: `anime-girl-sunset-glow-loneliness-3c-3840x2160.jpg`}" alt="avatar">
           </div>
-          <input @change="changeAvata" style="display: none" type="file" id="avatar">
+          <input name="image" ref="file" @change="changeAvata()" style="display: none" type="file" id="avatar">
           <label for="avatar" class="cab__left__btn-edit">
             СМЕНИТЬ АВАТАРКУ
           </label>
@@ -183,6 +183,24 @@ export default {
     },
     async changeAvata(){
       console.log(`ЗАПРОС НА СМЕНУ АВАТАРКИ`)
+      
+
+      
+      
+      let formData = new FormData();
+      formData.append('image', this.$refs.file.files[0])
+    
+      console.log(formData.get(`image`));
+      
+      await this.axios.post("http://localhost:3001/upload/avatar", formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+        }
+      ).then((response) => {
+          console.log(response);
+      })
+       
     }
   }
 }
