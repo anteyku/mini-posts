@@ -45,6 +45,8 @@ router.beforeEach(async (to, from, next) => {
           store.state.logout = true;
           console.log(store.state.logout)
           store.state.user = response.data.user;
+          store.state.serverAdress = response.data.ipServer;
+          
         } else {
           store.state.logout = false;
           console.log(store.state.logout)

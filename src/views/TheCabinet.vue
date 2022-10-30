@@ -7,7 +7,7 @@
       <b-col lg="3">
         <div class="cab__left">
           <div class="cab__left__avatar">
-            <img v-lazy="{src: `anime-girl-sunset-glow-loneliness-3c-3840x2160.jpg`}" alt="avatar">
+            <img v-lazy="{src: this.srcAvatar}" alt="avatar">
           </div>
           <input name="image" ref="file" @change="changeAvata()" style="display: none" type="file" id="avatar">
           <label for="avatar" class="cab__left__btn-edit">
@@ -125,6 +125,16 @@ export default {
       this.$store.state.pageActive[elem] = false
     }
     this.$store.state.pageActive.cabinet = true;
+
+
+    // Делаю ссылку на сервер для загрузки аватарки
+    let regular = /public\//g;
+    let src = this.$store.state.user.avatarName.replace(regular, ``);
+    let src1 = src.replace(/\\/g, ``);
+    // this.$store.state - ip текущего сервера
+    // src1 - путь к файлу
+    this.srcAvatar = `http://${this.$store.state.serverAdress}/${src1}`;
+   
   },
   data(){
     return {
@@ -153,7 +163,8 @@ export default {
           descText:this.$store.state.user.password,
           editText: ``
         }
-      }
+      },
+      srcAvatar: ``
     }
   },
   methods: {
@@ -177,28 +188,43 @@ export default {
                         text: 'Изминения успешно вступили в силу'
                     })
 
+                  
 
                   }        
       })      
     },
+    // Смена ватарки
     async changeAvata(){
-      console.log(`ЗАПРОС НА СМЕНУ АВАТАРКИ`)
-      
 
-      
-      
+      // 1. Выбор картинки
       let formData = new FormData();
       formData.append('image', this.$refs.file.files[0])
     
-      console.log(formData.get(`image`));
+      //console.log(formData.get(`image`));
       
+      // 2. Отправка картинки на сервер
       await this.axios.post("http://localhost:3001/upload/avatar", formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
         }
       ).then((response) => {
-          console.log(response);
+          if(!response.data.succes){
+                   this.$snackbar.add({
+                        type: 'error',
+                        title: "Ошибка",
+                        text: `${response.data.text}`
+                    })
+                    return
+          }
+                    this.$snackbar.add({
+                        type: 'success',
+                        title: "Сохранено",
+                        text: 'Изминения успешно вступили в силу'
+                    })
+
+                    // Устанавливаю ссылку на аватарку
+                    this.srcAvatar = response.data.url;
       })
        
     }
