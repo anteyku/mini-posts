@@ -28,6 +28,9 @@ import VueAxios from 'vue-axios'
 import { SnackbarService, Vue3Snackbar } from "vue3-snackbar";
 import "vue3-snackbar/dist/style.css";
 
+// Редактирования текста
+import VueEditor from "vue3-editor";
+
 
 // СДЕЛАЛ КОМИТ КОМАНДОЙ 4
 
@@ -63,6 +66,7 @@ router.beforeEach(async (to, from, next) => {
 
 
 let app = createApp(App)
+app.use(VueEditor);
 app.use(SnackbarService);
 app.component("vue3-snackbar", Vue3Snackbar);
 app.use(VueAxios, axios)

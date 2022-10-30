@@ -27,6 +27,7 @@
     "vue-router": "^4.0.16",
     "vue-upload-component": "^3.1.2",
     "vue3-dropzone": "^2.0.1",
+    "vue3-editor": "^0.1.1",
     "vue3-lazyload": "^0.3.6",
     "vue3-snackbar": "^1.1.2",
     "vuelidate": "^0.7.7",

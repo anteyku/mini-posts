@@ -80,7 +80,7 @@
     </b-row>
     <b-row>
       <b-col offset-lg="8" lg="4">
-        <div class="cob__btn-create-post">СОЗДАТЬ ПОСТ</div>
+        <router-link to="/createPost" class="cob__btn-create-post">СОЗДАТЬ ПОСТ</router-link>
       </b-col>
     </b-row>
   </b-container>
@@ -128,12 +128,17 @@ export default {
 
 
     // Делаю ссылку на сервер для загрузки аватарки
-    let regular = /public\//g;
-    let src = this.$store.state.user.avatarName.replace(regular, ``);
-    let src1 = src.replace(/\\/g, ``);
-    // this.$store.state - ip текущего сервера
-    // src1 - путь к файлу
-    this.srcAvatar = `http://${this.$store.state.serverAdress}/${src1}`;
+    if(this.$store.state.user.avatarName){
+      let regular = /public\//g;
+      let src = this.$store.state.user.avatarName.replace(regular, ``);
+      let src1 = src.replace(/\\/g, ``);
+      // this.$store.state - ip текущего сервера
+      // src1 - путь к файлу
+      this.srcAvatar = `http://${this.$store.state.serverAdress}/${src1}`;
+    } else {
+      this.srcAvatar = `anime-girl-sunset-glow-loneliness-3c-3840x2160.jpg`
+    }
+
    
   },
   data(){
@@ -392,6 +397,8 @@ export default {
       padding: 12px;
       font-weight: 400;
       margin-top: 29px;
+      display: block;
+      text-decoration: none;
       cursor: pointer;
         border-style: solid;
         border-color:#1976D2;

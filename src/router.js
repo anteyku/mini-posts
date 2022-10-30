@@ -42,6 +42,12 @@ export default createRouter({
       name: `register`,
       meta: {layout: `register`},
       component: ()=> import(`@/views/TheRegister.vue`)
+    },
+    // Страница создания постов
+    {
+      path: `/createPost`,
+      name: `create`,
+      component: ()=> import(`@/views/TheCreatePost.vue`)
     }
   ]
 })
