@@ -139,6 +139,9 @@ export default {
       this.srcAvatar = `anime-girl-sunset-glow-loneliness-3c-3840x2160.jpg`
     }
 
+
+                
+
    
   },
   data(){
@@ -208,6 +211,7 @@ export default {
       //console.log(formData.get(`image`));
       
       // 2. Отправка картинки на сервер
+
       await this.axios.post("http://localhost:3001/upload/avatar", formData, {
             headers: {
               'Content-Type': 'multipart/form-data'

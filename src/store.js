@@ -21,7 +21,8 @@ let store = createStore({
       // Данные пользователя
       user: ``,
       // Ip:port сервера с которого мы будем брать картинки
-      serverAdress: ``
+      serverAdress: ``,
+      CSRF: ``
     }
   }
 })

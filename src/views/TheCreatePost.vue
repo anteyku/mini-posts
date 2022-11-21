@@ -1,4 +1,7 @@
 <template>
+<teleport to="body">
+    <vue3-snackbar style="font-family: sans-serif" bottom left :duration="3000"></vue3-snackbar>
+</teleport>
   <b-container class="createPost">
     <b-row>
       <b-col lg="12">
@@ -15,9 +18,13 @@
         <div class="createPost__title">Предварительный просмотр</div>
       </b-col>
   </b-row>
+  
   <b-row>
-    <b-col class="createPost__preview" v-html="description" lg="12"></b-col>
+    <b-col lg="12">
+      <div class="createPost__preview" v-html="description"></div>
+    </b-col>
   </b-row>
+
     <b-row>
       <b-col lg="12">
         <div class="createPost__text-editor">
@@ -28,49 +35,35 @@
     <b-row>
       <b-col lg="12">
         <div class="createPost__uploadImg">
-          <b-row v-for="file in files" :key="file" class="createPost__uploadImg__category">
-            <b-col lg="12" class="createPost__uploadImg__category__name">
-              Картинка
-            </b-col>
-            <b-col lg="4" offset-lg="4" class="createPost__uploadImg__category__img">
-              <img :src="file.thumb" alt="upload-img">
-            </b-col>
-            <b-col lg="12" class="createPost__uploadImg__category__name">
-              Имя - {{ file.name }}
+          <b-row class="createPost__uploadImg__category">
+            <b-col lg="4" class="createPost__uploadImg__category__img">
+              <img v-if="srcImg" :src="srcImg" alt="upload-img">
             </b-col>
           </b-row>
         </div>
       </b-col>
     </b-row>
-    <b-row>
+
+    <b-row >
       <b-col lg="12">
-              <file-upload 
-                name="avatar"
-                ref="upload"
-                v-model="files"
-                post-action="http://localhost:3003/uploadFile"
-                :data="{
-                  title: title,
-                  description: description
-                  }"
-                @input-file="inputFile"
-                @input-filter="inputFilter"
-                :size="5242880"
-                :timeout="5000"
-                :maximum="1"
-              >
-                  <div class="createPost__titleImg">
-                    <div class="createPost__titleImg__img"><i class="material-icons">image</i></div>
-                    <div class="createPost__titleImg__title">Загрузите фотографию для заголовка</div>
-                  </div> 
-              </file-upload>
+        
+        
+        <input style="display: none" ref="file" @change="changeReader" type="file" name="imageTitle" id="imgTitle">
+
+         <label for="imgTitle" class="createPost__titleImg">
+            <div class="createPost__titleImg__img"><i class="material-icons">image</i></div>
+            <div class="createPost__titleImg__title">Загрузите фотографию для заголовка</div>
+          </label> 
+
+
+
       </b-col>
     </b-row>
 
 
     <b-row>
       <b-col lg="4" offset-lg="4">
-            <div class="createPost__button">СОЗДАТЬ ПОСТ</div>
+          <div  @click="uploadPost" class="createPost__button">СОЗДАТЬ ПОСТ</div>
       </b-col>
     </b-row>
   </b-container>
@@ -81,68 +74,72 @@
 <script>
 
 
-import {ref} from 'vue'
-import VueUploadComponent from 'vue-upload-component'
+//import {ref} from 'vue'
+//import FileUpload from 'vue-upload-component'
 
 export default {
   components: {
-    FileUpload: VueUploadComponent
+   // FileUpload
+  },
+  mounted(){
+   
   },
   methods: {
+    async uploadPost(){
 
-      inputFile: function (newFile, oldFile) {
-      
-        if (newFile && oldFile && !newFile.active && oldFile.active) {
-          // Get response data
-          console.log('response', newFile.response)
-          if (newFile.xhr) {
-            //  Get the response status code
-            console.log('status', newFile.xhr.status)
-            if(newFile.xhr.status){
-              console.log(newFile.response)
+      let formData = new FormData();
+      formData.append('imageTitle', this.$refs.file.files[0])
+      formData.append("title", this.title)
+      formData.append("description", this.description)
+     // console.log(formData.get(`image`));
+      await this.axios.post("http://localhost:3001/upload/imageTitle", formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
             }
-          }
         }
-      },
+      ).then((response)=>{
+        console.log(response)
+        if(response.data.succes == false){
+          console.log(`НА СЕРВЕРЕ ПРОИЗОШЛА ОШИБКА`)
+                   this.$snackbar.add({
+                        type: 'error',
+                        title: "Ошибка",
+                        text: `${response.data.text}`
+                    })          
+        } else if(response.data.succes == true){
+                   this.$router.push('post') 
+                   this.$snackbar.add({
+                        type: 'success',
+                        title: "Успешно",
+                        text: `${response.data.text}`
+                    })          
+                             
+        }
+      })
 
-      // Фильтр проверяющий формат файлов
-      inputFilter: function (newFile, oldFile, prevent) {
-        if (newFile && !oldFile) {
-          if (!/\.(jpeg|jpg|png|webp)$/i.test(newFile.name)) {
-            console.log(`НЕ ПРОШЛО ПРОВЕРКУ В ФИЛЬТРАХ`)
-     
-            return prevent()
-          }
-        }
+    },
+    changeReader(){
+      this.reader.readAsDataURL(this.$refs.file.files[0]);
+      console.log(`Записан новый файл`)
+      this.reader.addEventListener(`load`, ()=>{
+        console.log(`Загрузкился рридер ${this.reader.result}`)
+        this.srcImg = this.reader.result;
+      })
+      console.log(this.reader);
+    }
 
-        // Create a blob field
-        newFile.blob = ''
-        let URL = window.URL || window.webkitURL
-        if (URL && URL.createObjectURL) {
-          newFile.blob = URL.createObjectURL(newFile.file)
-        }
-        // Thumbnails
-        // Добавляем путь для просмотра картинки
-        newFile.thumb = ''
-        if (newFile.blob && newFile.type.substr(0, 6) === 'image/') {
-          newFile.thumb = newFile.blob
-        }
-        console.log(newFile);
-      }
+
+  
   },
   data(){
     return {
-      files: [],
       title: ``,
-      description: ``
+      description: ``,
+      reader: new FileReader(),
+      srcImg: undefined
     }
-  },
-  setup(){
-      const upload = ref(null);
-      return {
-        upload
-      }
-  }  
+  }
+
 }
 </script>
 
@@ -151,12 +148,14 @@ export default {
   @inter: 'Inter', sans-serif;
 
 .createPost__preview{
-  
+  margin-top: 20px;
+  margin-bottom: 20px;
+  text-align: none;
 }
 
 .createPost__uploadImg{
   border-color: red;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   .createPost__uploadImg__category{
     font-family: @roboto;
     font-size: 16px;
