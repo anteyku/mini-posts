@@ -13,7 +13,9 @@ import 'material-design-icons/iconfont/material-icons.css'
 // Библиотека для подгрузки внешних скриптов
   // Стили Normalaiz.css
   import './normalaiz.css'
-// Ленивая загрузка картинок  
+
+  // Стили Vant фреймворка ui компонентов
+import 'vant/lib/index.css';
 
 // Ленивая загрузка елементов
 import VueLazyLoad from 'vue3-lazyload'

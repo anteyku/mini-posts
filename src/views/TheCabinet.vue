@@ -92,25 +92,25 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-col lg="4">
+      <b-col v-for="elem of myPosts" :key="elem" lg="4">
         <div class="post__mini-post">
           <div class="post__mini-post__img">
-            <img v-lazy="{src: `img/angel-anime-girl-school-uniform-cat-rain-9h-3840x2160.jpg`}" alt="poster">
+            <img v-lazy="{src: elem.srcCover}" alt="poster">
             <div class="post__mini-post__img__time">
                <i class="material-icons">access_time</i>
-              23:00 01.03.2022
+              {{ elem.createTime }}
             </div>
           </div>
           <div class="post__mini-post__shadow">
-            <div class="post__mini-post__title">Чем занимаються собаки когда хозяев нету дома</div>
-            <div class="post__mini-post__description">Или же все же таки у нас все в порядке но ничего не делают.</div>
+            <div class="post__mini-post__title">{{ elem.title }}</div>
+            <div v-html="elem.description" class="post__mini-post__description van-multi-ellipsis--l2"></div>
             <div class="post__mini-post__line"></div>
             <div class="post__mini-post__author">
-              <img src="anime-girl-sunset-glow-loneliness-3c-3840x2160.jpg" alt="author">
-            <span>by</span> Faradeya
+              <img v-lazy="{src: this.srcAvatar}" alt="author">
+            <span>by </span> {{$store.state.user.login}}
             </div>
-            <div class="post__mini-post__btn-delete">УДАЛИТЬ</div>
-            <div class="post__mini-post__btn-edit">РЕДАКТИРОВАТЬ</div>
+            <div @click="deletePost(elem._id)" class="post__mini-post__btn-delete">УДАЛИТЬ</div>
+            <div @click="editPost(elem._id)" class="post__mini-post__btn-edit">РЕДАКТИРОВАТЬ</div>
           </div>
         </div>
       </b-col>
@@ -120,7 +120,7 @@
 </template>
 <script>
 export default {
-  mounted(){
+  async mounted(){
     for(let elem in this.$store.state.pageActive){
       this.$store.state.pageActive[elem] = false
     }
@@ -139,7 +139,22 @@ export default {
       this.srcAvatar = `anime-girl-sunset-glow-loneliness-3c-3840x2160.jpg`
     }
 
+  // Получения всех постов пользователя
+  await this.axios.get(`http://localhost:3001/getPosts/`).then((response)=>{
+    if(response.data.success == false){
+      console.log(`У пользователя нету постов`);
+    } else if(response.data.success == true){
+      for(let elem of response.data.posts){
+        let regular = /public\//g;
+        let src = elem.srcCover.replace(regular, ``);
+        let src1 = src.replace(/\\/g, ``);
+        elem.srcCover = `http://${this.$store.state.serverAdress}/${src1}`;
+        this.myPosts.push(elem)
 
+
+      }
+    }
+  })
                 
 
    
@@ -172,7 +187,8 @@ export default {
           editText: ``
         }
       },
-      srcAvatar: ``
+      srcAvatar: ``,
+      myPosts: []
     }
   },
   methods: {
@@ -236,7 +252,39 @@ export default {
                     this.srcAvatar = response.data.url;
       })
        
-    }
+    },
+    async deletePost(value){
+      //"`http://`+ $store.state.serverAdress + `/deletePost/` + elem._id"
+      
+    
+
+      await this.axios.get(`http://`+ this.$store.state.serverAdress + `/deletePost/` + value)
+      .then((response)=>{
+        if(response.data.success == true){
+                    this.$snackbar.add({
+                        type: 'success',
+                        title: "Удалено",
+                        text: 'Успешное удаления поста'
+                    })          
+                    // Удаления данного поста со страницы
+                            for(let i = 0; i < this.myPosts.length; i++){
+                              if(this.myPosts[i]._id == value){
+                                this.myPosts.splice(i, 1);
+                              }
+                            }
+        } else if(response.data.success == false){{
+                      this.$snackbar.add({
+                        type: 'error',
+                        title: "Ошибка",
+                        text: 'Упс... чтото пошло не так'
+                    })                  
+        }}
+      })      
+      
+    },
+    async editPost(){
+      console.log(`РЕДАКТИРОВАНИЯ ПОСТА`)
+    }  
   }
 }
 </script>
@@ -263,6 +311,8 @@ export default {
 
       .post__mini-post__img{
         position: relative;
+        max-height: 230px;
+        overflow: hidden;
 
         img{
           z-index: 0;
@@ -334,6 +384,7 @@ export default {
           span{
             color: rgba(0, 0, 0, 0.49);
             margin-left: 14px;
+            margin-right: 10px;
           }
           img{
             width: 35px;
@@ -355,6 +406,7 @@ export default {
           border-color: #F44336;
           color: #F44336;
           cursor: pointer;
+          display: block;
 
           &:hover{
             background-color: #F44336;

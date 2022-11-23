@@ -48,6 +48,12 @@ export default createRouter({
       path: `/createPost`,
       name: `create`,
       component: ()=> import(`@/views/TheCreatePost.vue`)
+    },
+    // Редактирования поста
+    {
+      path: `/editPost/:token`,
+      name: `editPost`,
+      component: ()=> import(`@/views/TheEdit.vue`)
     }
   ]
 })
