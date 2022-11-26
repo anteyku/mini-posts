@@ -110,7 +110,7 @@
             <span>by </span> {{$store.state.user.login}}
             </div>
             <div @click="deletePost(elem._id)" class="post__mini-post__btn-delete">УДАЛИТЬ</div>
-            <div @click="editPost(elem._id)" class="post__mini-post__btn-edit">РЕДАКТИРОВАТЬ</div>
+            <router-link :to="`/editPost/`+elem._id" class="post__mini-post__btn-edit">РЕДАКТИРОВАТЬ</router-link>
           </div>
         </div>
       </b-col>
@@ -281,10 +281,7 @@ export default {
         }}
       })      
       
-    },
-    async editPost(){
-      console.log(`РЕДАКТИРОВАНИЯ ПОСТА`)
-    }  
+    }
   }
 }
 </script>
@@ -427,6 +424,7 @@ export default {
           border-color: #1976D2;
           color: #1976D2;
           cursor: pointer;
+          display: block;
 
           &:hover{
             background-color: #1976D2;

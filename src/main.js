@@ -54,6 +54,7 @@ router.beforeEach(async (to, from, next) => {
           store.state.user = response.data.user;
           store.state.serverAdress = response.data.ipServer;
           store.state.CSRF = response.data.csrf;
+        
         } else {
           store.state.logout = false;
           console.log(store.state.logout)

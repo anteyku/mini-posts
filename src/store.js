@@ -9,7 +9,8 @@ let store = createStore({
         cabinet: false,
         posts: false,
         auth: false,
-        register: false
+        register: false,
+        edit: false
       },
       // Язык сайта
       multilingualism: {
